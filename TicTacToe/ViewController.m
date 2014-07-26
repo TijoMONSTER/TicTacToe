@@ -8,7 +8,7 @@
 
 #import "ViewController.h"
 
-@interface ViewController ()
+@interface ViewController () <UIAlertViewDelegate>
 @property (weak, nonatomic) IBOutlet UILabel *myLabelOne;
 @property (weak, nonatomic) IBOutlet UILabel *myLabelTwo;
 @property (weak, nonatomic) IBOutlet UILabel *myLabelThree;
@@ -22,12 +22,7 @@
 
 @property int numberOfTurns;
 @property UILabel *lastTappedLabel;
-
-
 @property NSString *currentPlayer;
-
-
-
 
 @end
 
@@ -38,11 +33,15 @@
     [super viewDidLoad];
 
 
+    [self initGame];
+}
+
+- (void)initGame
+{
     self.currentPlayer = @"X";
     self.whichPlayerLabel.text = self.currentPlayer;
 
     self.numberOfTurns = 0;
-
 }
 
 -(UILabel *)findLabelUsingPoint:(CGPoint)point
@@ -85,17 +84,23 @@
             self.numberOfTurns ++;
 
             // at least five turns to check who won
-             if (self.numberOfTurns >= 5)
-             {
-                 if ([[self whoWon] isEqualToString:@"X"])
+//             if (self.numberOfTurns >= 5)
+//             {
+                 NSString *winner = [self whoWon];
+
+                 if (winner != nil)
                  {
-                     NSLog(@"X wins");
+                     UIAlertView *alertView = [[UIAlertView alloc] init];
+                     alertView.title = @"Congratulations!";
+                     alertView.message = [NSString stringWithFormat:@"%@ wins!", winner];
+                     alertView.delegate = self;
+                     
+                     [alertView addButtonWithTitle:@"Play again"];
+                     [alertView show];
+
+                     return;
                  }
-                 else if ([[self whoWon] isEqualToString:@"O"])
-                 {
-                     NSLog(@"O wins");
-                 }
-             }
+//             }
 
             // change to next player and show it on whichPlayerLabel
             [self changeCurrentPlayer];
@@ -178,6 +183,22 @@
     {
         self.currentPlayer = @"X";
     }
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    // reset game
+    self.myLabelOne.text = nil;
+    self.myLabelTwo.text = nil;
+    self.myLabelThree.text = nil;
+    self.myLabelFour.text = nil;
+    self.myLabelFive.text = nil;
+    self.myLabelSix.text = nil;
+    self.myLabelSeven.text = nil;
+    self.myLabelEight.text = nil;
+    self.myLabelNine.text = nil;
+
+    [self initGame];
 }
 
 @end
