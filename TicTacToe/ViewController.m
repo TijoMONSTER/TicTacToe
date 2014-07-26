@@ -20,8 +20,14 @@
 @property (weak, nonatomic) IBOutlet UILabel *myLabelNine;
 @property (weak, nonatomic) IBOutlet UILabel *whichPlayerLabel;
 
-@property NSArray *gameLabels;
+@property int numberOfTurns;
+@property UILabel *lastTappedLabel;
+
+
 @property NSString *currentPlayer;
+
+
+
 
 @end
 
@@ -30,59 +36,147 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.gameLabels = @[self.myLabelOne,
-                            self.myLabelTwo,
-                            self.myLabelThree,
-                            self.myLabelFour,
-                            self.myLabelFive,
-                            self.myLabelSix,
-                            self.myLabelSeven,
-                            self.myLabelEight,
-                            self.myLabelNine];
+
 
     self.currentPlayer = @"X";
     self.whichPlayerLabel.text = self.currentPlayer;
+
+    self.numberOfTurns = 0;
+
 }
 
 -(UILabel *)findLabelUsingPoint:(CGPoint)point
 {
-    // check in the array of labels if any was tapped
-    for (UILabel *label in self.gameLabels) {
-        if (CGRectContainsPoint(label.frame, point)) {
-            return label;
-        }
+    UILabel *touchedLabel;
+
+    // get the view which contains the point
+    UIView *touchedView = [self.view hitTest:point withEvent:nil];
+
+    // if the view is a label, return it
+    if ([touchedView isKindOfClass:[UILabel class]]) {
+        touchedLabel = (UILabel *)touchedView;
     }
 
-    NSLog(@"No label tapped");
-    return nil;
+    return touchedLabel;
 }
 
 - (IBAction)onLabelTapped:(UITapGestureRecognizer *)tapGestureRecognizer
 {
     if (tapGestureRecognizer.state == UIGestureRecognizerStateEnded) {
-        UILabel *tappedLabel = [self findLabelUsingPoint:[tapGestureRecognizer locationInView:self.view]];
+        CGPoint point = [tapGestureRecognizer locationInView:self.view];
+        self.lastTappedLabel = [self findLabelUsingPoint:point];
 
         // If a label was tapped and it was not already tapped
-        if (tappedLabel && [tappedLabel.text length] == 0) {
+        if (self.lastTappedLabel && [self.lastTappedLabel.text length] == 0) {
 
-            if ([self.currentPlayer isEqualToString:@"X"]) {
-                tappedLabel.text = @"X";
-                tappedLabel.textColor = [UIColor blueColor];
-            } else {
-                tappedLabel.text = @"O";
-                tappedLabel.textColor = [UIColor redColor];
+            // set it's text and text color properties
+            if ([self.currentPlayer isEqualToString:@"X"])
+            {
+                self.lastTappedLabel.text = @"X";
+                self.lastTappedLabel.textColor = [UIColor blueColor];
             }
-//            tappedLabel.text = self.currentPlayer;
+            else
+            {
+                self.lastTappedLabel.text = @"O";
+                self.lastTappedLabel.textColor = [UIColor redColor];
+            }
 
-            // change next player and show it
-            if ([self.currentPlayer isEqualToString:@"X"]) {
-                self.currentPlayer = @"O";
-            } else {
-                self.currentPlayer = @"X";
-            }
+            // increment the number of labels tapped
+            self.numberOfTurns ++;
+
+            // at least five turns to check who won
+             if (self.numberOfTurns >= 5)
+             {
+                 if ([[self whoWon] isEqualToString:@"X"])
+                 {
+                     NSLog(@"X wins");
+                 }
+                 else if ([[self whoWon] isEqualToString:@"O"])
+                 {
+                     NSLog(@"O wins");
+                 }
+             }
+
+            // change to next player and show it on whichPlayerLabel
+            [self changeCurrentPlayer];
             self.whichPlayerLabel.text = self.currentPlayer;
 
         }
+    }
+
+}
+
+- (NSString *)whoWon
+{
+    NSString *winner;
+
+    // first row
+    if ([self compareLabelText:self.myLabelOne secondLabel:self.myLabelTwo thirdLabel:self.myLabelThree])
+    {
+        winner = self.currentPlayer;
+    }
+    // second row
+    else if ([self compareLabelText:self.myLabelFour secondLabel:self.myLabelFive thirdLabel:self.myLabelSix])
+    {
+        winner = self.currentPlayer;
+    }
+    // third row
+    else if ([self compareLabelText:self.myLabelSeven secondLabel:self.myLabelEight thirdLabel:self.myLabelNine])
+    {
+        winner = self.currentPlayer;
+    }
+
+    // first column
+    else if ([self compareLabelText:self.myLabelOne secondLabel:self.myLabelFour thirdLabel:self.myLabelSeven])
+    {
+        winner = self.currentPlayer;
+    }
+    // second column
+    else if ([self compareLabelText:self.myLabelTwo secondLabel:self.myLabelFive thirdLabel:self.myLabelEight])
+    {
+        winner = self.currentPlayer;
+    }
+    // third column
+    else if ([self compareLabelText:self.myLabelThree secondLabel:self.myLabelSix thirdLabel:self.myLabelNine])
+    {
+        winner = self.currentPlayer;
+    }
+
+    // top-left diagonal
+    else if ([self compareLabelText:self.myLabelOne secondLabel:self.myLabelFive thirdLabel:self.myLabelNine])
+    {
+        winner = self.currentPlayer;
+    }
+    // top-right diagonal
+    else if ([self compareLabelText:self.myLabelThree secondLabel:self.myLabelFive thirdLabel:self.myLabelSeven])
+    {
+        winner = self.currentPlayer;
+    }
+
+    return winner;
+}
+
+- (BOOL)compareLabelText:(UILabel *)firstLabel secondLabel:(UILabel *)secondLabel thirdLabel:(UILabel *)thirdLabel
+{
+    // check for empty labels
+    if ((firstLabel.text == nil || [firstLabel.text isEqualToString:@""]) || (secondLabel.text == nil || [secondLabel.text isEqualToString:@""]) || (thirdLabel.text == nil || [thirdLabel.text isEqualToString:@""]))
+    {
+        return NO;
+    }
+
+    // same text, return YES
+    return [firstLabel.text isEqualToString:secondLabel.text] && [firstLabel.text isEqualToString:thirdLabel.text];
+}
+
+- (void)changeCurrentPlayer
+{
+    if ([self.currentPlayer isEqualToString:@"X"])
+    {
+        self.currentPlayer = @"O";
+    }
+    else if ([self.currentPlayer isEqualToString:@"O"])
+    {
+        self.currentPlayer = @"X";
     }
 }
 
