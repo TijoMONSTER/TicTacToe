@@ -149,7 +149,8 @@
 - (void)setTurnTimer
 {
     [self removeTurnTimer];
-    self.turnTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(onTurnTimer:) userInfo:nil repeats:NO];
+    // 5 seconds for each turn
+    self.turnTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(onTurnTimer:) userInfo:nil repeats:NO];
 }
 
 - (void)onTurnTimer:(NSTimer *)timer
@@ -305,5 +306,6 @@
     self.draggableLabel.center = self.draggableLabelOriginalPosition;
     self.isDraggingLabel = NO;
 }
+
 
 @end

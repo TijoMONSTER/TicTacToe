@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2C13C23419856BEF009BA50F /* CheckMate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C13C23319856BEF009BA50F /* CheckMate.framework */; };
+		2C13C237198586C6009BA50F /* HelpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C13C236198586C6009BA50F /* HelpViewController.m */; };
 		2CAAED441981A157002994EC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CAAED431981A157002994EC /* Foundation.framework */; };
 		2CAAED461981A157002994EC /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CAAED451981A157002994EC /* CoreGraphics.framework */; };
 		2CAAED481981A157002994EC /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2CAAED471981A157002994EC /* UIKit.framework */; };
@@ -36,6 +37,8 @@
 
 /* Begin PBXFileReference section */
 		2C13C23319856BEF009BA50F /* CheckMate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CheckMate.framework; sourceTree = "<group>"; };
+		2C13C235198586C6009BA50F /* HelpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelpViewController.h; sourceTree = "<group>"; };
+		2C13C236198586C6009BA50F /* HelpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HelpViewController.m; sourceTree = "<group>"; };
 		2CAAED401981A157002994EC /* TicTacToe.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TicTacToe.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CAAED431981A157002994EC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		2CAAED451981A157002994EC /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -119,6 +122,8 @@
 				2CAAED521981A157002994EC /* AppDelegate.h */,
 				2CAAED531981A157002994EC /* AppDelegate.m */,
 				2CAAED551981A157002994EC /* Main.storyboard */,
+				2C13C235198586C6009BA50F /* HelpViewController.h */,
+				2C13C236198586C6009BA50F /* HelpViewController.m */,
 				2CAAED581981A157002994EC /* ViewController.h */,
 				2CAAED591981A157002994EC /* ViewController.m */,
 				2CAAED5B1981A157002994EC /* Images.xcassets */,
@@ -256,6 +261,7 @@
 				2CAAED5A1981A157002994EC /* ViewController.m in Sources */,
 				2CAAED541981A157002994EC /* AppDelegate.m in Sources */,
 				2CAAED501981A157002994EC /* main.m in Sources */,
+				2C13C237198586C6009BA50F /* HelpViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
