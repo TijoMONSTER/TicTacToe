@@ -27,6 +27,8 @@
 @property CGPoint draggableLabelOriginalPosition;
 @property BOOL isDraggingLabel;
 
+// stretch 2
+@property NSTimer *turnTimer;
 
 @end
 
@@ -44,8 +46,11 @@
 {
     self.currentPlayer = @"X";
     self.whichPlayerLabel.text = self.currentPlayer;
+
     self.draggableLabel.text = self.currentPlayer;
     self.draggableLabel.textColor = [UIColor blueColor];
+
+    [self setTurnTimer];
 }
 
 -(UILabel *)findLabelUsingPoint:(CGPoint)point
@@ -70,39 +75,94 @@
     {
         CGPoint point = [tapGestureRecognizer locationInView:self.view];
         UILabel *tappedLabel = [self findLabelUsingPoint:point];
-        [self tapOnLabel:tappedLabel];
-    }
 
+        [self setTappedLabelAndEndTurn:tappedLabel];
+    }
 }
 
-- (void)tapOnLabel:(UILabel *)label
+- (void)setTappedLabelAndEndTurn:(UILabel *)label
 {
-    // If label was tapped and it was not already tapped
+    // If label was not already tapped
     if (label && [label.text length] == 0)
     {
         // set it's text and text color properties
-        [self adjustLabelTextAndColorToCurrentPlayer: label];
+        [self adjustLabelTextAndColorToCurrentPlayer:label];
+        [self endTurn];
+    }
+}
 
-        NSString *winner = [self whoWon];
+- (void)endTurn
+{
+    // remove current timer
+    [self removeTurnTimer];
 
-        if (winner)
+    NSString *winner = [self whoWon];
+
+    if (!winner) {
+        // If there's no winner, change to next player
+        [self changeCurrentPlayer];
+        // Adjust the draggable label according to current player
+        [self adjustLabelTextAndColorToCurrentPlayer:self.draggableLabel];
+
+        // set a new timer
+        [self setTurnTimer];
+    }
+    else
+    {
+        UIAlertView *alertView = [[UIAlertView alloc] init];
+        alertView.delegate = self;
+        alertView.alpha = 0.2;
+
+        // if it was not a draw
+        if (![winner isEqualToString:@"-"])
         {
-            UIAlertView *alertView = [[UIAlertView alloc] init];
             alertView.title = @"Congratulations!";
             alertView.message = [NSString stringWithFormat:@"%@ wins!", winner];
-            alertView.delegate = self;
-
-            [alertView addButtonWithTitle:@"Play again"];
-            [alertView show];
-
-            return;
+        }
+        else
+        {
+            alertView.title = @"Boooo!";
+            alertView.message = @"It was a draw!";
         }
 
-        // change to next player and show it on whichPlayerLabel
-        [self changeCurrentPlayer];
-        [self adjustLabelTextAndColorToCurrentPlayer:self.draggableLabel];
-        self.whichPlayerLabel.text = self.currentPlayer;
-        
+        [alertView addButtonWithTitle:@"Play again"];
+        [alertView show];
+    }
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    // reset game
+    self.myLabelOne.text = @"";
+    self.myLabelTwo.text = @"";
+    self.myLabelThree.text = @"";
+    self.myLabelFour.text = @"";
+    self.myLabelFive.text = @"";
+    self.myLabelSix.text = @"";
+    self.myLabelSeven.text = @"";
+    self.myLabelEight.text = @"";
+    self.myLabelNine.text = @"";
+
+    [self initGame];
+}
+
+- (void)setTurnTimer
+{
+    [self removeTurnTimer];
+    self.turnTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(onTurnTimer:) userInfo:nil repeats:NO];
+}
+
+- (void)onTurnTimer:(NSTimer *)timer
+{
+    [self stopDrag];
+    [self endTurn];
+}
+
+- (void)removeTurnTimer
+{
+    if (self.turnTimer) {
+        [self.turnTimer invalidate];
+        self.turnTimer = nil;
     }
 }
 
@@ -152,6 +212,22 @@
     {
         winner = self.currentPlayer;
     }
+    else
+    {
+        // If all of the slots are taken
+        if ([self.myLabelOne.text length] > 0 &&
+            [self.myLabelTwo.text length] > 0 &&
+            [self.myLabelThree.text length] > 0 &&
+            [self.myLabelFour.text length] > 0 &&
+            [self.myLabelFive.text length] > 0 &&
+            [self.myLabelSix.text length] > 0 &&
+            [self.myLabelSeven.text length] > 0 &&
+            [self.myLabelEight.text length] > 0 &&
+            [self.myLabelNine.text length] > 0)
+        {
+            winner = @"-";
+        }
+    }
 
     return winner;
 }
@@ -178,6 +254,8 @@
     {
         self.currentPlayer = @"X";
     }
+
+    self.whichPlayerLabel.text = self.currentPlayer;
 }
 
 - (void)adjustLabelTextAndColorToCurrentPlayer:(UILabel *)label
@@ -192,22 +270,6 @@
         label.text = @"O";
         label.textColor = [UIColor redColor];
     }
-}
-
-- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-    // reset game
-    self.myLabelOne.text = nil;
-    self.myLabelTwo.text = nil;
-    self.myLabelThree.text = nil;
-    self.myLabelFour.text = nil;
-    self.myLabelFive.text = nil;
-    self.myLabelSix.text = nil;
-    self.myLabelSeven.text = nil;
-    self.myLabelEight.text = nil;
-    self.myLabelNine.text = nil;
-
-    [self initGame];
 }
 
 - (IBAction)onDrag:(UIPanGestureRecognizer *)gestureRecognizer
@@ -230,13 +292,18 @@
     }
     else if (gestureRecognizer.state == UIGestureRecognizerStateEnded)
     {
+        // stop drag and set the target label
         UILabel *targetLabel = [self findLabelUsingPoint:self.draggableLabel.center];
-        [self tapOnLabel:targetLabel];
-
-        // return draggable label it to its original position
-        self.draggableLabel.center = self.draggableLabelOriginalPosition;
-        self.isDraggingLabel = NO;
+        [self setTappedLabelAndEndTurn:targetLabel];
+        [self stopDrag];
     }
+}
+
+- (void)stopDrag
+{
+    // return draggable label it to its original position
+    self.draggableLabel.center = self.draggableLabelOriginalPosition;
+    self.isDraggingLabel = NO;
 }
 
 @end
