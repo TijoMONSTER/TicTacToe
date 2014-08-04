@@ -19,7 +19,9 @@
 @property (weak, nonatomic) IBOutlet UILabel *myLabelEight;
 @property (weak, nonatomic) IBOutlet UILabel *myLabelNine;
 @property (weak, nonatomic) IBOutlet UILabel *whichPlayerLabel;
+@property (weak, nonatomic) IBOutlet UILabel *timeLabel;
 
+@property int turnTime;
 @property NSString *currentPlayer;
 
 // stretch 1
@@ -50,6 +52,8 @@
     self.draggableLabel.text = self.currentPlayer;
     self.draggableLabel.textColor = [UIColor blueColor];
 
+	self.turnTime = 5;
+	[self updateTimeLabelText];
     [self setTurnTimer];
 }
 
@@ -150,14 +154,19 @@
 - (void)setTurnTimer
 {
     [self removeTurnTimer];
+	self.turnTime = 5;
     // 5 seconds for each turn
-    self.turnTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(onTurnTimer:) userInfo:nil repeats:NO];
+    self.turnTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(onTurnTimer:) userInfo:nil repeats:YES];
 }
 
 - (void)onTurnTimer:(NSTimer *)timer
 {
-    [self stopDrag];
-    [self endTurn];
+	if (-- self.turnTime <= 0) {
+		[self stopDrag];
+		[self endTurn];
+	}
+
+	[self updateTimeLabelText];
 }
 
 - (void)removeTurnTimer
@@ -298,6 +307,11 @@
     // return draggable label it to its original position
     self.draggableLabel.center = self.draggableLabelOriginalPosition;
     self.isDraggingLabel = NO;
+}
+
+- (void)updateTimeLabelText
+{
+	self.timeLabel.text = [NSString stringWithFormat:@"%d", self.turnTime];
 }
 
 @end
