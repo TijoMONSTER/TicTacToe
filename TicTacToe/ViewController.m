@@ -93,6 +93,7 @@
 
 - (void)endTurn
 {
+	NSLog(@"end turn");
     // remove current timer
     [self removeTurnTimer];
 
@@ -247,15 +248,7 @@
 
 - (void)changeCurrentPlayer
 {
-    if ([self.currentPlayer isEqualToString:@"X"])
-    {
-        self.currentPlayer = @"O";
-    }
-    else
-    {
-        self.currentPlayer = @"X";
-    }
-
+	self.currentPlayer = [self.currentPlayer isEqualToString:@"X"] ? @"O" : @"X";
     self.whichPlayerLabel.text = self.currentPlayer;
 }
 
