@@ -32,6 +32,8 @@
 // stretch 2
 @property NSTimer *turnTimer;
 
+@property NSArray *gameLabels;
+
 @end
 
 @implementation ViewController
@@ -39,6 +41,16 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+	self.gameLabels = @[self.myLabelOne,
+						self.myLabelTwo,
+						self.myLabelThree,
+						self.myLabelFour,
+						self.myLabelFive,
+						self.myLabelSix,
+						self.myLabelSeven,
+						self.myLabelEight,
+						self.myLabelNine];
 
     self.draggableLabelOriginalPosition = self.draggableLabel.center;
     [self initGame];
@@ -69,7 +81,6 @@
     {
         touchedLabel = (UILabel *)touchedView;
     }
-
     return touchedLabel;
 }
 
@@ -111,6 +122,10 @@
 
         // set a new timer
         [self setTurnTimer];
+
+		if ([self.currentPlayer isEqualToString:@"O"]) {
+			[self startComputerTurn];
+		}
     }
     else
     {
@@ -312,6 +327,21 @@
 - (void)updateTimeLabelText
 {
 	self.timeLabel.text = [NSString stringWithFormat:@"%d", self.turnTime];
+}
+
+- (void)startComputerTurn
+{
+	NSMutableArray *availableSlots = [NSMutableArray array];
+
+	for (UILabel *label in self.gameLabels) {
+		if ([label.text isEqualToString:@""]) {
+			[availableSlots addObject:label];
+		}
+	}
+
+	int selectedIndex = arc4random() % [availableSlots count];
+	UILabel *selectedLabel = (UILabel *)[availableSlots objectAtIndex:selectedIndex];
+	[self performSelector:@selector(setTappedLabelAndEndTurn:) withObject:selectedLabel afterDelay:1.0];
 }
 
 @end
