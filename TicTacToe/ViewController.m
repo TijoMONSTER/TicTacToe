@@ -307,5 +307,4 @@
     self.isDraggingLabel = NO;
 }
 
-
 @end
